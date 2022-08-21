@@ -52,6 +52,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.previousButton.setOnClickListener {
             currentIndex = (currentIndex - 1) % questionBank.size
+            if (currentIndex == -1) currentIndex = questionBank.lastIndex
             isAnswered(currentIndex)
             updateQuestion()
         }
@@ -71,8 +72,6 @@ class MainActivity : AppCompatActivity() {
             question = questionBank[currentIndex]
         } catch (ex: ArrayIndexOutOfBoundsException) {
             Log.e(TAG, "Index was out of bounds", ex)
-            currentIndex = 5
-            question = questionBank[currentIndex]
         }
 
         val questionTextResId = question.textResId
