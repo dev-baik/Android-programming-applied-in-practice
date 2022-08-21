@@ -12,6 +12,7 @@ import com.example.geoquiz.databinding.ActivityMainBinding
 private const val TAG = "MainActivity"
 
 class MainActivity : AppCompatActivity() {
+    private var messageResId = 0
     private lateinit var question: Question
     private lateinit var binding: ActivityMainBinding
 
@@ -24,6 +25,8 @@ class MainActivity : AppCompatActivity() {
         Question(R.string.question_asia, true, false))
 
     private var currentIndex = 0
+    private var answeredQuestionCount = 0
+    private var correctAnswerCount = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,11 +40,12 @@ class MainActivity : AppCompatActivity() {
             toast.show()
 
             questionBank[currentIndex].answered = true
-            isAnswered(currentIndex)
+            answeredQuestionCount++
             checkAnswer(true)
        }
 
         binding.falseButton.setOnClickListener { view: View ->
+            answeredQuestionCount++
             checkAnswer(false)
         }
 
@@ -76,18 +80,27 @@ class MainActivity : AppCompatActivity() {
 
         val questionTextResId = question.textResId
         binding.questionTextView.setText(questionTextResId)
+
     }
 
     private fun checkAnswer(userAnswer: Boolean) {
         val correctAnswer = questionBank[currentIndex].answer
 
-        val messageResId = if (userAnswer == correctAnswer) {
-            R.string.correct_toast
+        if (userAnswer == correctAnswer) {
+            messageResId = R.string.correct_toast
+            correctAnswerCount++
         } else {
-            R.string.incorrect_toast
+            messageResId = R.string.incorrect_toast
         }
 
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
+
+        binding.trueButton.isEnabled = false
+        binding.falseButton.isEnabled = false
+
+        if (answeredQuestionCount == questionBank.size) {
+            Toast.makeText(this, "${correctAnswerCount/questionBank.size.toDouble() * 100} %", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun isAnswered(index: Int) {
