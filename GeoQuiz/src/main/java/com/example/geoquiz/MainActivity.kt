@@ -16,12 +16,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     private val questionBank = listOf(
-        Question(R.string.question_australia, true),
-        Question(R.string.question_oceans, true),
-        Question(R.string.question_mideast, false),
-        Question(R.string.question_africa, false),
-        Question(R.string.question_americas, true),
-        Question(R.string.question_asia, true))
+        Question(R.string.question_australia, true, false),
+        Question(R.string.question_oceans, true, false),
+        Question(R.string.question_mideast, false, false),
+        Question(R.string.question_africa, false, false),
+        Question(R.string.question_americas, true, false),
+        Question(R.string.question_asia, true, false))
 
     private var currentIndex = 0
 
@@ -35,6 +35,10 @@ class MainActivity : AppCompatActivity() {
             var toast = Toast.makeText(this, R.string.correct_toast, Toast.LENGTH_SHORT)
             toast.setGravity(Gravity.TOP, 0, 200)
             toast.show()
+
+            questionBank[currentIndex].answered = true
+            isAnswered(currentIndex)
+            checkAnswer(true)
        }
 
         binding.falseButton.setOnClickListener { view: View ->
@@ -48,11 +52,13 @@ class MainActivity : AppCompatActivity() {
 
         binding.previousButton.setOnClickListener {
             currentIndex = (currentIndex - 1) % questionBank.size
+            isAnswered(currentIndex)
             updateQuestion()
         }
 
         binding.nextButton.setOnClickListener {
             currentIndex = (currentIndex + 1) % questionBank.size
+            isAnswered(currentIndex)
             updateQuestion()
         }
         updateQuestion()
@@ -83,6 +89,16 @@ class MainActivity : AppCompatActivity() {
         }
 
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun isAnswered(index: Int) {
+        if (questionBank[index].answered) {
+            binding.trueButton.isEnabled = false
+            binding.falseButton.isEnabled = false
+        } else {
+            binding.trueButton.isEnabled = true
+            binding.falseButton.isEnabled = true
+        }
     }
 
     override fun onStart() {
