@@ -3,6 +3,7 @@ package com.example.geoquiz
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.provider.Contacts.SettingsColumns.KEY
 import android.util.Log
 import android.view.Gravity
 import android.view.View
@@ -13,6 +14,7 @@ import com.example.geoquiz.databinding.ActivityMainBinding
 
 private const val TAG = "MainActivity"
 private const val KEY_INDEX = "index"
+private const val KEY_CHEAT = "cheat"
 private const val REQUEST_CODE_CHEAT = 0
 
 class MainActivity : AppCompatActivity() {
@@ -36,6 +38,8 @@ class MainActivity : AppCompatActivity() {
         var currentIndex = savedInstanceState?.getInt(KEY_INDEX, 0)?: 0
         quizViewModel.currentIndex = currentIndex
 
+        var currentCheat = savedInstanceState?.getBoolean(KEY_CHEAT, false)?: false
+        quizViewModel.isCheater = currentCheat
 
         val provider: ViewModelProvider = ViewModelProvider(this)
         val quizViewModel = provider.get(QuizViewModel::class.java)
@@ -176,6 +180,7 @@ class MainActivity : AppCompatActivity() {
         super.onSaveInstanceState(savedInstanceState)
         Log.d(TAG, "onSaveInstanceState")
         savedInstanceState.putInt(KEY_INDEX, quizViewModel.currentIndex)
+        savedInstanceState.putBoolean(KEY_CHEAT, quizViewModel.isCheater)
     }
 
     override fun onStop() {
