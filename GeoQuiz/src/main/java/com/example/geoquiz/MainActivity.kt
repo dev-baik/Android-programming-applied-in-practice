@@ -68,7 +68,7 @@ class MainActivity : AppCompatActivity() {
             quizViewModel.moveToPrevious()
             if (quizViewModel.currentIndex == -1) quizViewModel.currentIndex = questionBank.lastIndex
             isAnswered(quizViewModel.currentIndex)
-            quizViewModel.isCheater = false
+//            quizViewModel.isCheater = false
             updateQuestion()
         }
 
@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
 //            currentIndex = (currentIndex + 1) % questionBank.size
             quizViewModel.moveToNext()
             isAnswered(quizViewModel.currentIndex)
-            quizViewModel.isCheater = false
+//            quizViewModel.isCheater = false
             updateQuestion()
         }
 
@@ -88,6 +88,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         updateQuestion()
+
+        quizViewModel.initCheatProtection()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -99,6 +101,9 @@ class MainActivity : AppCompatActivity() {
 
         if (requestCode == REQUEST_CODE_CHEAT) {
             quizViewModel.isCheater = data?.getBooleanExtra(EXTRA_ANSWER_SHOWN, false) ?: false
+            if (quizViewModel.isCheater) {
+                quizViewModel.setCheatedQuestion(quizViewModel.currentIndex)
+            }
         }
     }
 
@@ -127,9 +132,22 @@ class MainActivity : AppCompatActivity() {
 //            quizViewModel.questionBank[quizViewModel.currentIndex].answered = true
 //            messageResId = R.string.incorrect_toast
 //        }
-//
+
+//        val messageResId = when {
+//            quizViewModel.isCheater -> {
+//                quizViewModel.questionBank[quizViewModel.currentIndex].answered = true
+//                R.string.judgment_toast
+//            }
+//            userAnswer == correctAnswer -> {
+//                quizViewModel.questionBank[quizViewModel.currentIndex].answered = true
+//                correctAnswerCount++
+//                R.string.correct_toast
+//            }
+//            else -> R.string.incorrect_toast
+//        }
+
         val messageResId = when {
-            quizViewModel.isCheater -> {
+            quizViewModel.cheatedQuestions[quizViewModel.currentIndex] -> {
                 quizViewModel.questionBank[quizViewModel.currentIndex].answered = true
                 R.string.judgment_toast
             }

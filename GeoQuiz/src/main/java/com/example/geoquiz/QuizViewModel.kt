@@ -41,4 +41,16 @@ class QuizViewModel : ViewModel() {
     }
 
     var isCheater = false
+
+    var cheatedQuestions = mutableListOf<Boolean>()
+
+    fun initCheatProtection() {
+        for (i in questionBank.indices) {
+            cheatedQuestions.add(false)
+        }
+    }
+
+    fun setCheatedQuestion(questionIndex: Int) {
+        cheatedQuestions[questionIndex] = true
+    }
 }
