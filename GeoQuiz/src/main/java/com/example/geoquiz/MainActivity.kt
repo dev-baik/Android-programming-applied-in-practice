@@ -1,18 +1,19 @@
 package com.example.geoquiz
 
-import androidx.appcompat.app.AppCompatActivity
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.util.Log
 import android.view.Gravity
 import android.view.View
-import android.widget.Button
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.geoquiz.databinding.ActivityMainBinding
 
 private const val TAG = "MainActivity"
 private const val KEY_INDEX = "index"
+private const val REQUEST_CODE_CHEAT = 0
 
 class MainActivity : AppCompatActivity() {
     private var messageResId = 0
@@ -30,21 +31,20 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        var currentIndex = savedInstanceState?.getInt(KEY_INDEX, 0) ?: 0
-        quizViewModel.currentIndex = currentIndex
-
         val questionBank = quizViewModel.questionBank
 
-//        val provider: ViewModelProvider = ViewModelProvider(this)
-//        val quizViewModel = provider.get(QuizViewModel::class.java)
-//        Log.d(TAG, "Got a QuizViewModel: $quizViewModel")
+        var currentIndex = savedInstanceState?.getInt(KEY_INDEX, 0)?: 0
+        quizViewModel.currentIndex = currentIndex
+
+
+        val provider: ViewModelProvider = ViewModelProvider(this)
+        val quizViewModel = provider.get(QuizViewModel::class.java)
+        Log.d(TAG, "Got a QuizViewModel: $quizViewModel")
 
         binding.trueButton.setOnClickListener {
             var toast = Toast.makeText(this, R.string.correct_toast, Toast.LENGTH_SHORT)
             toast.setGravity(Gravity.TOP, 0, 200)
             toast.show()
-
-            questionBank[currentIndex].answered = true
             answeredQuestionCount++
             checkAnswer(true)
        }
@@ -55,35 +55,57 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.questionTextView.setOnClickListener {
-            currentIndex = (currentIndex + 1) % questionBank.size
+            quizViewModel.currentIndex = (quizViewModel.currentIndex + 1) % questionBank.size
             updateQuestion()
         }
 
         binding.previousButton.setOnClickListener {
 //            currentIndex = (currentIndex - 1) % questionBank.size
             quizViewModel.moveToPrevious()
-            if (currentIndex == -1) currentIndex = questionBank.lastIndex
-            isAnswered(currentIndex)
+            if (quizViewModel.currentIndex == -1) quizViewModel.currentIndex = questionBank.lastIndex
+            isAnswered(quizViewModel.currentIndex)
+            quizViewModel.isCheater = false
             updateQuestion()
         }
 
         binding.nextButton.setOnClickListener {
 //            currentIndex = (currentIndex + 1) % questionBank.size
             quizViewModel.moveToNext()
-            isAnswered(currentIndex)
+            isAnswered(quizViewModel.currentIndex)
+            quizViewModel.isCheater = false
             updateQuestion()
         }
+
+        binding.cheatButton.setOnClickListener {
+//            val intent = Intent(this, CheatActivity::class.java)
+            val answerIsTrue = quizViewModel.currentQuestionAnswer
+            val intent = CheatActivity.newIntent(this@MainActivity, answerIsTrue)
+            startActivityForResult(intent, REQUEST_CODE_CHEAT)
+        }
+
         updateQuestion()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode != Activity.RESULT_OK) {
+            return
+        }
+
+        if (requestCode == REQUEST_CODE_CHEAT) {
+            quizViewModel.isCheater = data?.getBooleanExtra(EXTRA_ANSWER_SHOWN, false) ?: false
+        }
     }
 
     private fun updateQuestion() {
 //        Log.d(TAG, "Current question index: $currentIndex")
 
-        try {
-            question = quizViewModel.questionBank[quizViewModel.currentIndex]
-        } catch (ex: ArrayIndexOutOfBoundsException) {
-            Log.e(TAG, "Index was out of bounds", ex)
-        }
+//        try {
+//            question = quizViewModel.questionBank[quizViewModel.currentIndex]
+//        } catch (ex: ArrayIndexOutOfBoundsException) {
+//            Log.e(TAG, "Index was out of bounds", ex)
+//        }
 
         val questionTextResId = quizViewModel.currentQuestionText
         binding.questionTextView.setText(questionTextResId)
@@ -93,11 +115,26 @@ class MainActivity : AppCompatActivity() {
     private fun checkAnswer(userAnswer: Boolean) {
         val correctAnswer = quizViewModel.currentQuestionAnswer
 
-        if (userAnswer == correctAnswer) {
-            messageResId = R.string.correct_toast
-            correctAnswerCount++
-        } else {
-            messageResId = R.string.incorrect_toast
+//        if (userAnswer == correctAnswer) {
+//            messageResId = R.string.correct_toast
+//            quizViewModel.questionBank[quizViewModel.currentIndex].answered = true
+//            correctAnswerCount++
+//        } else {
+//            quizViewModel.questionBank[quizViewModel.currentIndex].answered = true
+//            messageResId = R.string.incorrect_toast
+//        }
+//
+        val messageResId = when {
+            quizViewModel.isCheater -> {
+                quizViewModel.questionBank[quizViewModel.currentIndex].answered = true
+                R.string.judgment_toast
+            }
+            userAnswer == correctAnswer -> {
+                quizViewModel.questionBank[quizViewModel.currentIndex].answered = true
+                correctAnswerCount++
+                R.string.correct_toast
+            }
+            else -> R.string.incorrect_toast
         }
 
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
