@@ -3,6 +3,7 @@ package com.example.geoquiz
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -22,6 +23,9 @@ class CheatActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityCheatBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val buildNumber = Build.VERSION.SDK_INT.toString()
+        binding.apiLevel.text = "API Level: $buildNumber"
 
         answerIsTrue = intent.getBooleanExtra(EXTRA_ANSWER_IS_TRUE, false)
         binding.showAnswerButton.setOnClickListener {
