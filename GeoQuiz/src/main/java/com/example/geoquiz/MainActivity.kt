@@ -84,16 +84,26 @@ class MainActivity : AppCompatActivity() {
             updateQuestion()
         }
 
-        binding.cheatButton.setOnClickListener {
-//            val intent = Intent(this, CheatActivity::class.java)
-            val answerIsTrue = quizViewModel.currentQuestionAnswer
-            val intent = CheatActivity.newIntent(this@MainActivity, answerIsTrue)
+        var cheatCount = 3
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                val options = ActivityOptions.makeClipRevealAnimation(it, 0, 0, it.width, it.height)
-                startActivityForResult(intent, REQUEST_CODE_CHEAT, options.toBundle())
-            } else {
-                startActivityForResult(intent, REQUEST_CODE_CHEAT)
+        binding.cheatButton.setOnClickListener {
+            if (cheatCount <= 3 && cheatCount != 0) {
+                cheatCount -= 1
+                binding.cheatCount!!.text = cheatCount.toString()
+
+                //            val intent = Intent(this, CheatActivity::class.java)
+                val answerIsTrue = quizViewModel.currentQuestionAnswer
+                val intent = CheatActivity.newIntent(this@MainActivity, answerIsTrue)
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    val options = ActivityOptions.makeClipRevealAnimation(it, 0, 0, it.width, it.height)
+                    startActivityForResult(intent, REQUEST_CODE_CHEAT, options.toBundle())
+                } else {
+                    startActivityForResult(intent, REQUEST_CODE_CHEAT)
+                }
+            }
+            if (cheatCount == 0) {
+                binding.cheatButton.isEnabled = false
             }
         }
 
