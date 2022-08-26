@@ -10,6 +10,10 @@ class CrimeListViewModel : ViewModel(){
             val crime = Crime()
             crime.title = "Crime #$i"
             crime.isSolved = i % 2 == 0
+            crime.requiresPolice = when ((0..1).shuffled().first()) {
+                0 -> false
+                else -> true
+            }
             crimes += crime
         }
     }
