@@ -14,12 +14,16 @@
             android:id="@+id/crime_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="16dp"
             android:text="Crime Title"/>
 
         <TextView
             android:id="@+id/crime_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="8dp"
             android:text="Crime Date"/>
 
     </LinearLayout>
@@ -33,6 +37,7 @@
         android:id="@+id/contact_police_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:text="경찰 개입"/>
 
 </LinearLayout>

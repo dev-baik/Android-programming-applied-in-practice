@@ -14,6 +14,10 @@ class CrimeListViewModel : ViewModel(){
                 0 -> false
                 else -> true
             }
+            crime.isSolved = when (i % 2 == 1) {
+                true -> true
+                else -> false
+            }
             crimes += crime
         }
     }
