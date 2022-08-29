@@ -1,4 +1,4 @@
-package com.example.crimefragment
+package com.example.criminalIntent
 
 import android.os.Bundle
 import android.text.format.DateFormat
@@ -14,7 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.crimefragment.databinding.FragmentCrimeListBinding
+import com.example.criminalIntent.databinding.FragmentCrimeListBinding
 
 private const val TAG = "CrimeListFragment"
 

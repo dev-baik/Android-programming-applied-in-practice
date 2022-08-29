@@ -1,4 +1,4 @@
-package com.example.crimefragment
+package com.example.criminalIntent
 
 import android.os.Bundle
 import android.text.Editable
@@ -7,7 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.example.crimefragment.databinding.FragmentCrimeBinding
+import com.example.criminalIntent.databinding.FragmentCrimeBinding
 
 class CrimeFragment : Fragment() {
     private lateinit var crime: Crime

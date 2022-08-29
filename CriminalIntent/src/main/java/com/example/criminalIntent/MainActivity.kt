@@ -1,8 +1,8 @@
-package com.example.crimefragment
+package com.example.criminalIntent
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.example.crimefragment.databinding.ActivityMainBinding
+import com.example.criminalIntent.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding : ActivityMainBinding

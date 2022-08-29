@@ -1,4 +1,4 @@
-package com.example.crimefragment
+package com.example.criminalIntent
 
 import androidx.lifecycle.ViewModel
 
