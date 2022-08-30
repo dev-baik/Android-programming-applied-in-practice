@@ -12,7 +12,9 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.criminalIntent.databinding.FragmentCrimeListBinding
 import java.util.*
@@ -29,7 +31,8 @@ class CrimeListFragment : Fragment() {
     private lateinit var crimeRecyclerView: RecyclerView
     private lateinit var binding: FragmentCrimeListBinding
 //    private var adapter: CrimeAdapter? = null
-    private var adapter: CrimeAdapter? = CrimeAdapter(emptyList())
+//    private var adapter: CrimeAdapter? = CrimeAdapter(emptyList())
+    private var adapter: CrimeAdapter? = CrimeAdapter()
 
     private val crimeListViewModel: CrimeListViewModel by lazy {
         ViewModelProvider(this).get(CrimeListViewModel::class.java)
@@ -97,9 +100,13 @@ class CrimeListFragment : Fragment() {
 //        crimeRecyclerView.adapter = adapter
 //    }
 
+//    private fun updateUI(crimes: List<Crime>) {
+//        adapter = CrimeAdapter(crimes)
+//        crimeRecyclerView.adapter = adapter
+//    }
+
     private fun updateUI(crimes: List<Crime>) {
-        adapter = CrimeAdapter(crimes)
-        crimeRecyclerView.adapter = adapter
+        adapter?.submitList(crimes)
     }
 
     private inner class NormalCrimeHolder(view: View)
@@ -148,25 +155,52 @@ class CrimeListFragment : Fragment() {
 //        }
 //    }
 
-    private inner class CrimeAdapter(var crimes: List<Crime>)
-        : RecyclerView.Adapter<CrimeHolder>() {
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CrimeHolder {
-//            return when (viewType) {
-//                0 -> {
-//                    val view = layoutInflater.inflate(R.layout.list_item_crime, parent, false)
-//                    NormalCrimeHolder(view)
-//                }
-//                else -> {
-//                    val view = layoutInflater.inflate(R.layout.list_item_serious_crime, parent, false)
-//                    SeriousCrimeHolder(view)
-//                }
+//    private inner class CrimeAdapter(var crimes: List<Crime>)
+//        : RecyclerView.Adapter<CrimeHolder>() {
+//        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CrimeHolder {
+////            return when (viewType) {
+////                0 -> {
+////                    val view = layoutInflater.inflate(R.layout.list_item_crime, parent, false)
+////                    NormalCrimeHolder(view)
+////                }
+////                else -> {
+////                    val view = layoutInflater.inflate(R.layout.list_item_serious_crime, parent, false)
+////                    SeriousCrimeHolder(view)
+////                }
+////            }
+//            val view = layoutInflater.inflate(R.layout.list_item_crime, parent, false)
+//            return NormalCrimeHolder(view)
+//        }
+//
+//        override fun onBindViewHolder(holder: CrimeHolder, position: Int) {
+//            val crime = crimes[position]
+//            when (holder) {
+//                is NormalCrimeHolder -> holder.bind(crime)
+////                is SeriousCrimeHolder -> holder.bind(crime)
+//                else -> throw IllegalArgumentException()
 //            }
+//        }
+//
+////        override fun getItemViewType(position: Int): Int {
+////            val crime = crimes[position]
+////            return when (crime.requiresPolice) {
+////                true -> 1
+////                else -> 0
+////            }
+////        }
+//
+//        override fun getItemCount(): Int = crimes.size
+//    }
+
+    private inner class CrimeAdapter
+        : ListAdapter<Crime, CrimeHolder>(DiffCallback) {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CrimeHolder {
             val view = layoutInflater.inflate(R.layout.list_item_crime, parent, false)
             return NormalCrimeHolder(view)
         }
 
         override fun onBindViewHolder(holder: CrimeHolder, position: Int) {
-            val crime = crimes[position]
+            val crime = currentList[position]
             when (holder) {
                 is NormalCrimeHolder -> holder.bind(crime)
 //                is SeriousCrimeHolder -> holder.bind(crime)
@@ -174,14 +208,16 @@ class CrimeListFragment : Fragment() {
             }
         }
 
-//        override fun getItemViewType(position: Int): Int {
-//            val crime = crimes[position]
-//            return when (crime.requiresPolice) {
-//                true -> 1
-//                else -> 0
-//            }
-//        }
+        override fun getItemCount() = currentList.size
+    }
 
-        override fun getItemCount(): Int = crimes.size
+    object DiffCallback : DiffUtil.ItemCallback<Crime>() {
+        override fun areItemsTheSame(oldItem: Crime, newItem: Crime): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: Crime, newItem: Crime): Boolean {
+            return oldItem == newItem
+        }
     }
 }
