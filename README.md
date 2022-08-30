@@ -14,3 +14,4 @@
 | 09 | RecyclerView로 리스트 보여주기 | RecyclerView의 ViewType |
 | 10 | 레이아웃과 위젯으로 사용자 인터페이스 생성하기 | 날짜 형식 지정하기 |
 | 11 | 데이터베이스와 Room 라이브러리 |  |
+| 12 | 프래그먼트 간의 이동 | 효율적으로 RecyclerView를 다시 로드하기 |
