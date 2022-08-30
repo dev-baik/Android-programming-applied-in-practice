@@ -3,8 +3,11 @@ package com.example.criminalIntent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.example.criminalIntent.databinding.ActivityMainBinding
+import java.util.*
 
-class MainActivity : AppCompatActivity() {
+private const val TAG = "MainActivity"
+
+class MainActivity : AppCompatActivity(), CrimeListFragment.Callbacks {
     private lateinit var binding : ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,5 +24,16 @@ class MainActivity : AppCompatActivity() {
                 .add(R.id.fragment_container, fragment)
                 .commit()
         }
+    }
+
+    override fun onCrimeSelected(crimeId: UUID) {
+//        Log.d(TAG, "MainActivity.onCrimeSelected: $crimeId")
+//        val fragment = CrimeFragment()
+        val fragment = CrimeFragment.newInstance(crimeId)
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 }
