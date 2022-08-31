@@ -1,5 +1,6 @@
 package com.example.criminalIntent
 
+import android.app.ProgressDialog.show
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -10,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.criminalIntent.databinding.FragmentCrimeBinding
 import androidx.lifecycle.Observer
+import java.sql.Time
 import java.util.*
 
 private const val TAG = "CrimeFragment"
@@ -17,7 +19,7 @@ private const val ARG_CRIME_ID = "crime_id"
 private const val DIALOG_DATE = "DialogDate"
 private const val REQUEST_DATE = 0
 
-class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
+class CrimeFragment : Fragment(), DatePickerFragment.Callbacks, TimePickerFragment.Callbacks {
     private lateinit var crime: Crime
 
     private lateinit var binding : FragmentCrimeBinding
@@ -91,7 +93,7 @@ class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
 //            DatePickerFragment().apply {
 //                show(this@CrimeFragment.getParentFragmentManager(), DIALOG_DATE)
 //            }
-            DatePickerFragment.newInstance(crime.date).apply {
+            TimePickerFragment.newInstance(crime.date).apply {
                 setTargetFragment(this@CrimeFragment, REQUEST_DATE)
                 show(this@CrimeFragment.getParentFragmentManager(), DIALOG_DATE)
             }
@@ -125,6 +127,11 @@ class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
     }
 
     override fun onDateSelected(date: Date) {
+        crime.date = date
+        updateUI()
+    }
+
+    override fun onTimeSelected(date: Date) {
         crime.date = date
         updateUI()
     }
