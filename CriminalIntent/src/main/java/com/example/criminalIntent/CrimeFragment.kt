@@ -14,8 +14,10 @@ import java.util.*
 
 private const val TAG = "CrimeFragment"
 private const val ARG_CRIME_ID = "crime_id"
+private const val DIALOG_DATE = "DialogDate"
+private const val REQUEST_DATE = 0
 
-class CrimeFragment : Fragment() {
+class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
     private lateinit var crime: Crime
 
     private lateinit var binding : FragmentCrimeBinding
@@ -42,10 +44,10 @@ class CrimeFragment : Fragment() {
 
         binding = FragmentCrimeBinding.inflate(inflater, container, false)
 
-        binding.crimeDate.apply {
-            text = crime.date.toString()
-            isEnabled = false
-        }
+//        binding.crimeDate.apply {
+//            text = crime.date.toString()
+//            isEnabled = false
+//        }
 
         return binding.root
     }
@@ -76,11 +78,22 @@ class CrimeFragment : Fragment() {
             override fun afterTextChanged(s: Editable?) {
             }
         }
+
         binding.crimeTitle.addTextChangedListener(titleWatcher)
 
         binding.crimeSolved.apply {
             setOnCheckedChangeListener { buttonView, isChecked ->
                 crime.isSolved = isChecked
+            }
+        }
+
+        binding.crimeDate.setOnClickListener {
+//            DatePickerFragment().apply {
+//                show(this@CrimeFragment.getParentFragmentManager(), DIALOG_DATE)
+//            }
+            DatePickerFragment.newInstance(crime.date).apply {
+                setTargetFragment(this@CrimeFragment, REQUEST_DATE)
+                show(this@CrimeFragment.getParentFragmentManager(), DIALOG_DATE)
             }
         }
     }
@@ -109,5 +122,10 @@ class CrimeFragment : Fragment() {
             isChecked = crime.isSolved
             jumpDrawablesToCurrentState()
         }
+    }
+
+    override fun onDateSelected(date: Date) {
+        crime.date = date
+        updateUI()
     }
 }
