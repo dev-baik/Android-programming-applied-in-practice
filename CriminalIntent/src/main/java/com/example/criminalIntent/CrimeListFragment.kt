@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.text.format.DateFormat
 import android.util.Log
 import android.view.*
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -127,7 +128,17 @@ class CrimeListFragment : Fragment() {
 //    }
 
     private fun updateUI(crimes: List<Crime>) {
-        adapter?.submitList(crimes)
+        if (crimes.isEmpty()){
+            binding.imageButton.visibility = View.VISIBLE
+            binding.imageButton.setOnClickListener {
+                val crime = Crime()
+                crimeListViewModel.addCrime(crime)
+                callbacks?.onCrimeSelected(crime.id)
+            }
+        } else {
+            adapter?.submitList(crimes)
+            binding.imageButton.visibility = View.INVISIBLE
+        }
     }
 
     private inner class NormalCrimeHolder(view: View)
