@@ -1,6 +1,9 @@
 package com.example.criminalIntent
 
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
@@ -10,6 +13,7 @@ import android.provider.ContactsContract
 import android.text.Editable
 import android.text.TextWatcher
 import android.text.format.DateFormat
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,6 +29,7 @@ private const val DIALOG_DATE = "DialogDate"
 private const val REQUEST_DATE = 0
 private const val DATE_FORMAT = "yyyy년 M월 d일 H시 m분, E요일"
 private const val REQUEST_CONTACT = 1
+private const val REQUEST_PHONE = 2
 
 class CrimeFragment : Fragment(), DatePickerFragment.Callbacks, TimePickerFragment.Callbacks {
     private lateinit var crime: Crime
@@ -125,10 +130,27 @@ class CrimeFragment : Fragment(), DatePickerFragment.Callbacks, TimePickerFragme
                 startActivityForResult(pickContactIntent, REQUEST_CONTACT)
             }
 //            pickContactIntent.addCategory(Intent.CATEGORY_HOME)
-            val packageManager: PackageManager = requireActivity().packageManager
-            val resolvedActivity: ResolveInfo? = packageManager.resolveActivity(pickContactIntent, PackageManager.MATCH_DEFAULT_ONLY)
-            if (resolvedActivity == null) {
-                isEnabled = false
+//            val packageManager: PackageManager = requireActivity().packageManager
+//            val resolvedActivity: ResolveInfo? = packageManager.resolveActivity(pickContactIntent, PackageManager.MATCH_DEFAULT_ONLY)
+//            Log.e("태그", resolvedActivity.toString())
+//            if (resolvedActivity == null) {
+//                isEnabled = false
+//            }
+        }
+
+//        binding.crimePhone.apply {
+//            val pickPhoneIntent = Intent(Intent.ACTION_PICK,ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
+//            setOnClickListener {
+//                startActivityForResult(pickPhoneIntent, REQUEST_PHONE)
+//            }
+//        }
+
+        binding.crimePhone.setOnClickListener {
+            Intent(Intent.ACTION_DIAL).apply {
+                val phone = crime.phone
+                data = Uri.parse("tel:$phone")
+            }.also { intent ->
+                startActivity(intent)
             }
         }
     }
@@ -184,28 +206,154 @@ class CrimeFragment : Fragment(), DatePickerFragment.Callbacks, TimePickerFragme
         when {
             resultCode != Activity.RESULT_OK -> return
 
+//            requestCode == REQUEST_CONTACT && data != null -> {
+//                val contactUri: Uri = data.data ?: return
+//
+//                // 쿼리에서 값으로 반환할 필드를 지정
+//                val queryFields = arrayOf(ContactsContract.Contacts.DISPLAY_NAME)
+//
+//                // 쿼리를 수행. contactUri는 콘텐츠 제공자의 테이블을 나타낸다.
+//                val cursor = requireActivity().contentResolver
+//                    .query(contactUri, queryFields, null, null, null)
+//
+//                cursor?.use {
+//                    // 쿼리 결과 데이터가 있는지 확인한다.
+//                    if (it.count == 0) {
+//                        return
+//                    }
+//                    // 첫 번째 데이터 행의 첫 번째 열의 값을 가져온다.
+//                    // 이 값이 용의자의 이름
+//                    it.moveToFirst()
+//                    val suspect = it.getString(0)
+//                    crime.suspect = suspect
+//                    crimeDetailViewModel.saveCrime(crime)
+//                    binding.crimeSuspect.text = suspect
+//                }
+//            }
+
+//            requestCode == REQUEST_PHONE && data != null -> {
+//                val contactURI : Uri? = data.data
+//
+//                //Got the phone ID
+//                val queryFields = ContactsContract.CommonDataKinds.Phone._ID
+//
+//                //Perform Your Query - the Phone.CONTENT_URI is like a "where" clause here
+//                val cursor =
+//                    requireActivity().contentResolver
+//                        .query(contactURI!!, null, queryFields, null, null)
+//
+//                cursor.use {
+//                    if (it?.count == 0) {
+//                        return
+//                    }
+//                    it?.moveToFirst()
+//                    val noIdx = it?.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+//                    val number = it?.getString(noIdx!!)
+//
+//                    val dialNumber = Intent(Intent.ACTION_DIAL)
+//                    dialNumber.data = Uri.parse("tel: $number")
+//                    startActivity(dialNumber)
+//                }
+//                cursor?.close()
+//            }
+
             requestCode == REQUEST_CONTACT && data != null -> {
                 val contactUri: Uri = data.data ?: return
 
-                // 쿼리에서 값으로 반환할 필드를 지정
                 val queryFields = arrayOf(ContactsContract.Contacts.DISPLAY_NAME)
 
-                // 쿼리를 수행. contactUri는 콘텐츠 제공자의 테이블을 나타낸다.
-                val cursor = requireActivity().contentResolver.query(contactUri, queryFields, null, null, null)
+                val cursor = requireActivity().contentResolver
+                    .query(contactUri, queryFields, null, null, null)
+
                 cursor?.use {
-                    // 쿼리 결과 데이터가 있는지 확인한다.
                     if (it.count == 0) {
                         return
                     }
-                    // 첫 번째 데이터 행의 첫 번째 열의 값을 가져온다.
-                    // 이 값이 용의자의 이름
                     it.moveToFirst()
                     val suspect = it.getString(0)
                     crime.suspect = suspect
-                    crimeDetailViewModel.saveCrime(crime)
                     binding.crimeSuspect.text = suspect
                 }
+
+                val queryFieldsId = arrayOf(ContactsContract.Contacts._ID)
+
+                val cursorId = requireActivity().contentResolver
+                    .query(contactUri, queryFieldsId, null, null, null)
+
+                cursorId?.use {
+                    if (it.count == 0) {
+                        return
+                    }
+
+                    it.moveToFirst()
+                    val contactId = it.getString(0)
+
+                    val phoneURI = ContactsContract.CommonDataKinds.Phone.CONTENT_URI
+
+                    val phoneNUmberQueryField = arrayOf(ContactsContract.CommonDataKinds.Phone.NUMBER)
+
+                    val phoneWhereClause = "${ContactsContract.CommonDataKinds.Phone.CONTACT_ID} = ?"
+
+                    val phoneQueryParameters = arrayOf(contactId)
+
+                    val phoneCursor = requireActivity().contentResolver
+                        .query(phoneURI, phoneNUmberQueryField, phoneWhereClause, phoneQueryParameters, null)
+
+                    phoneCursor?.use { cursorPhone ->
+                        cursorPhone.moveToFirst()
+                        val phoneNumValue = cursorPhone.getString(0)
+                        crime.phone = phoneNumValue
+                    }
+
+//                    TODO 연락처에 여러 번호가 있는 경우 번호를 선택하는 방법
+//                    var phoneNumber: String = ""
+//
+//                    val allNumbers: ArrayList<String> = arrayListOf<String>()
+//                    allNumbers.clear()
+//
+//                    phoneCursor?.use {cursorPhone ->
+//
+//                        cursorPhone.moveToFirst()
+//                        while (cursorPhone.isAfterLast == false)
+//                        {
+//                            phoneNumber = cursorPhone.getString(0)
+//                            allNumbers.add(phoneNumber)
+//                            cursorPhone.moveToNext()
+//                        }
+//                    }
+
+//                    val items = allNumbers.toTypedArray()
+//
+//                    var selectedNumber: String = ""
+//
+//                    val builder = AlertDialog.Builder(context)
+//                    builder.setTitle("Choose a Number:")
+//                    builder.setItems(items, DialogInterface.OnClickListener { dialog, which ->  selectedNumber = allNumbers[which].toString().replace("_","")
+//                        crime.phone = selectedNumber
+//                        binding.crimePhone.text = crime.phone
+//                    })
+//
+//                    val alert = builder.create()
+//                    if(allNumbers.size > 1) {
+//                        alert.show()
+//                    }
+//                    else if (allNumbers.size == 1 && allNumbers[0].length != 0) {
+//                        selectedNumber = allNumbers[0].toString().replace("_","")
+//                        crime.phone = selectedNumber
+//                        binding.crimePhone.text = crime.phone
+//
+//                    }
+//
+//                    else
+//                    {
+//                        binding.crimePhone.text = "no phone number found!"
+//                        crime.phone = ""
+//                    }
+
+                    crimeDetailViewModel.saveCrime(crime)
+                }
             }
+
         }
     }
 
