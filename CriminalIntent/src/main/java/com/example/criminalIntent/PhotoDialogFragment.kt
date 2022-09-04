@@ -3,39 +3,33 @@ package com.example.criminalIntent
 import android.app.Activity
 import android.graphics.Bitmap
 import android.graphics.Point
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.ImageView
 import androidx.fragment.app.DialogFragment
+import com.example.criminalIntent.databinding.PhotoDialogFragmentBinding
 import java.io.File
 
 class PhotoDialogFragment(val photofile : File) : DialogFragment() {
-
-    private lateinit var imageButton2: ImageButton
-    private lateinit var imageView: ImageView
+    private lateinit var binding: PhotoDialogFragmentBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.photo_dialog_fragment, container, false)
-        imageButton2 = view.findViewById(R.id.imageButton2) as ImageButton
-        imageView = view.findViewById(R.id.imageView) as ImageView
+        binding = PhotoDialogFragmentBinding.inflate(inflater, container, false)
 
         val image = getScaledBitmap(photofile.path, requireActivity())
-        imageView.setImageBitmap(image)
 
+        binding.imageView.setImageBitmap(image)
 
-        imageButton2.setOnClickListener {
+        binding.imageButton2.setOnClickListener {
             dismiss()
         }
 
-        return view
+        return binding.root
     }
 
     fun getScaledBitmap(path: String, activity: Activity): Bitmap {

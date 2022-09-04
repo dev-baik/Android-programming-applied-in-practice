@@ -38,6 +38,9 @@ class CrimeFragment : Fragment(), DatePickerFragment.Callbacks, TimePickerFragme
 
     private lateinit var binding : FragmentCrimeBinding
 
+    private var imageViewWidth = 0
+    private var imageViewheight = 0
+
     private val crimeDetailViewModel: CrimeDetailViewModel by lazy {
         ViewModelProvider(this).get(CrimeDetailViewModel::class.java)
     }
@@ -191,6 +194,13 @@ class CrimeFragment : Fragment(), DatePickerFragment.Callbacks, TimePickerFragme
             val fragment = PhotoDialogFragment(photoFile)
             fragment.show(childFragmentManager, "PhotoFragmentDialog")
         }
+
+        binding.crimePhoto.apply {
+            viewTreeObserver.addOnGlobalLayoutListener {
+                imageViewWidth = width
+                imageViewheight = height
+            }
+        }
     }
 
     override fun onStop() {
@@ -230,9 +240,18 @@ class CrimeFragment : Fragment(), DatePickerFragment.Callbacks, TimePickerFragme
         updatePhotoView()
     }
 
+//    private fun updatePhotoView() {
+//        if (photoFile.exists()) {
+//            val bitmap = getScaledBitmap(photoFile.path, requireActivity())
+//            binding.crimePhoto.setImageBitmap(bitmap)
+//        } else {
+//            binding.crimePhoto.setImageDrawable(null)
+//        }
+//    }
+
     private fun updatePhotoView() {
         if (photoFile.exists()) {
-            val bitmap = getScaledBitmap(photoFile.path, requireActivity())
+            val bitmap = getScaledBitmap(photoFile.path, imageViewWidth, imageViewheight)
             binding.crimePhoto.setImageBitmap(bitmap)
         } else {
             binding.crimePhoto.setImageDrawable(null)
