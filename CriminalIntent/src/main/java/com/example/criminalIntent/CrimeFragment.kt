@@ -186,6 +186,11 @@ class CrimeFragment : Fragment(), DatePickerFragment.Callbacks, TimePickerFragme
                 startActivityForResult(captureImage, REQUEST_PHOTO)
             }
         }
+
+        binding.crimePhoto.setOnClickListener {
+            val fragment = PhotoDialogFragment(photoFile)
+            fragment.show(childFragmentManager, "PhotoFragmentDialog")
+        }
     }
 
     override fun onStop() {
