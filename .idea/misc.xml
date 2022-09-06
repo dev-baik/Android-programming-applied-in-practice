@@ -3,6 +3,8 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/BEAK/AndroidStudioProjects/BusinessPractice_App/BeatBox/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="..\:/Users/BEAK/AndroidStudioProjects/BusinessPractice_App/BeatBox/src/main/res/layout/list_item_sound.xml" value="0.1" />
         <entry key="..\:/Users/BEAK/AndroidStudioProjects/BusinessPractice_App/CrimeFragment/src/main/res/layout/activity_main.xml" value="0.25364583333333335" />
         <entry key="..\:/Users/BEAK/AndroidStudioProjects/BusinessPractice_App/CrimeFragment/src/main/res/layout/fragment_crime.xml" value="0.21457085828343314" />
         <entry key="..\:/Users/BEAK/AndroidStudioProjects/BusinessPractice_App/CriminalIntent/src/main/res/layout/activity_main.xml" value="0.25364583333333335" />

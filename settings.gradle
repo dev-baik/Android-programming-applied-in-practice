@@ -16,3 +16,4 @@ rootProject.name = "BusinessPractice_App"
 include ':app'
 include ':GeoQuiz'
 include ':CriminalIntent'
+include ':BeatBox'
