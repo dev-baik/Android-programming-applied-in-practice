@@ -12,18 +12,18 @@ import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.nerdlauncher.databinding.ActivityNerdLauncherBinding
+import com.example.nerdlauncher.databinding.SingleItemBinding
 
 private const val TAG = "NerdLauncherActivity"
 
 class NerdLauncherActivity : AppCompatActivity() {
-    private lateinit var binding : ActivityNerdLauncherBinding
+    private lateinit var recyclerView: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityNerdLauncherBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        binding.appRecyclerView.layoutManager = LinearLayoutManager(this)
+        setContentView(R.layout.activity_nerd_launcher)
+        recyclerView = findViewById(R.id.app_recycler_view)
+        recyclerView.layoutManager = LinearLayoutManager(this)
 
         setupAdapter()
     }
@@ -42,22 +42,23 @@ class NerdLauncherActivity : AppCompatActivity() {
         })
 
         Log.i(TAG, "Found ${activities.size} activities")
-        binding.appRecyclerView.adapter = ActivityAdapter(activities)
+        recyclerView.adapter = ActivityAdapter(activities)
     }
 
-    private class ActivityHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
-        private val nameTextView = itemView as TextView
+    private class ActivityHolder(val binding: SingleItemBinding) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
         private lateinit var resolveInfo: ResolveInfo
 
         init {
-            nameTextView.setOnClickListener(this)
+            itemView.setOnClickListener(this)
         }
 
         fun bindActivity(resolveInfo: ResolveInfo) {
             this.resolveInfo = resolveInfo
             val packageManager = itemView.context.packageManager
             val appName = resolveInfo.loadLabel(packageManager).toString()
-            nameTextView.text = appName
+            val appIcon = resolveInfo.loadIcon(packageManager)
+            binding.textView.text = appName
+            binding.imageView.setImageDrawable(appIcon)
         }
 
         override fun onClick(view: View) {
@@ -75,9 +76,8 @@ class NerdLauncherActivity : AppCompatActivity() {
 
     private class ActivityAdapter(val activities: List<ResolveInfo>) : RecyclerView.Adapter<ActivityHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ActivityHolder {
-            val layoutInflater = LayoutInflater.from(parent.context)
-            val view = layoutInflater.inflate(android.R.layout.simple_list_item_1, parent, false)
-            return ActivityHolder(view)
+            val binding = SingleItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            return ActivityHolder(binding)
         }
 
         override fun onBindViewHolder(holder: ActivityHolder, position: Int) {
