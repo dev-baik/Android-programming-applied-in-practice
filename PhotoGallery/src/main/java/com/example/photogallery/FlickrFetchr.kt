@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import com.example.photogallery.api.FlickrApi
 import com.example.photogallery.api.FlickrResponse
 import com.example.photogallery.api.PhotoResponse
+import com.google.gson.GsonBuilder
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -18,10 +19,19 @@ class FlickrFetchr {
     private val flickrApi: FlickrApi
 
     init {
-        val retrofit: Retrofit = Retrofit.Builder()
+//        val retrofit: Retrofit = Retrofit.Builder()
+//            .baseUrl("https://api.flickr.com/")
+////            .addConverterFactory(ScalarsConverterFactory.create())
+//            .addConverterFactory(GsonConverterFactory.create())
+//            .build()
+
+        val gsonPhotoDeserializer = GsonBuilder()
+            .registerTypeAdapter(PhotoResponse::class.java, PhotoDeserializer())
+            .create()
+
+        val retrofit = Retrofit.Builder()
             .baseUrl("https://api.flickr.com/")
-//            .addConverterFactory(ScalarsConverterFactory.create())
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gsonPhotoDeserializer))
             .build()
 
         flickrApi = retrofit.create(FlickrApi::class.java)
@@ -45,27 +55,55 @@ class FlickrFetchr {
 //        return responseLiveData
 //    }
 
-    fun fetchPhotos(): LiveData<List<GalleryItem>> {
-        val responseLiveData: MutableLiveData<List<GalleryItem>> = MutableLiveData()
-        val flickrRequest: Call<FlickrResponse> = flickrApi.fetchPhotos()
+//    fun fetchPhotos(): LiveData<List<GalleryItem>> {
+//        val responseLiveData: MutableLiveData<List<GalleryItem>> = MutableLiveData()
+//        val flickrRequest: Call<FlickrResponse> = flickrApi.fetchPhotos()
+//
+//        flickrRequest.enqueue(object : Callback<FlickrResponse> {
+//            override fun onResponse(call: Call<FlickrResponse>, response: Response<FlickrResponse>) {
+//                Log.d(TAG, "Response received")
+//                val flickrResponse: FlickrResponse? = response.body()
+//                val photoResponse: PhotoResponse? = flickrResponse?.photos
+//                var galleryItems: List<GalleryItem> = photoResponse?.galleryItems ?: mutableListOf()
+//                galleryItems = galleryItems.filterNot {
+//                    it.url.isBlank()
+//                }
+//                responseLiveData.value = galleryItems
+//            }
+//
+//            override fun onFailure(call: Call<FlickrResponse>, t: Throwable) {
+//                Log.e(TAG,"Failed to fetch photos", t)
+//            }
+//        })
+//
+//        return responseLiveData
+//    }
 
-        flickrRequest.enqueue(object : Callback<FlickrResponse> {
-            override fun onResponse(call: Call<FlickrResponse>, response: Response<FlickrResponse>) {
+    fun fetchPhotos(): LiveData<List<GalleryItem>>{
+        val responseLiveData: MutableLiveData<List<GalleryItem>> = MutableLiveData()
+        val flickrRequest: Call<PhotoDeserializer> = flickrApi.fetchPhotos()
+
+
+        flickrRequest.enqueue(object : Callback<PhotoDeserializer> {
+            override fun onFailure(call: Call<PhotoDeserializer>, t: Throwable){
+                Log.e(TAG, "Failed to fetch photos", t)
+            }
+
+            override fun onResponse(
+                call: Call<PhotoDeserializer>,
+                response: Response<PhotoDeserializer>
+            ) {
                 Log.d(TAG, "Response received")
-                val flickrResponse: FlickrResponse? = response.body()
+                val flickrResponse: PhotoDeserializer? = response.body()
                 val photoResponse: PhotoResponse? = flickrResponse?.photos
-                var galleryItems: List<GalleryItem> = photoResponse?.galleryItems ?: mutableListOf()
+                var galleryItems: List<GalleryItem> = photoResponse?.galleryItems
+                    ?: mutableListOf()
                 galleryItems = galleryItems.filterNot {
                     it.url.isBlank()
                 }
                 responseLiveData.value = galleryItems
             }
-
-            override fun onFailure(call: Call<FlickrResponse>, t: Throwable) {
-                Log.e(TAG,"Failed to fetch photos", t)
-            }
         })
-
-        return responseLiveData
+        return  responseLiveData
     }
 }

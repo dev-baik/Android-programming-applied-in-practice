@@ -1,6 +1,7 @@
 package com.example.photogallery.api
 
 import com.example.photogallery.FlickrFetchr
+import com.example.photogallery.PhotoDeserializer
 import retrofit2.Call
 import retrofit2.http.GET
 
@@ -8,6 +9,7 @@ interface FlickrApi {
 //    @GET("/")
 //    fun fetchContents(): Call<String>
 //    fun fetchPhotos(): Call<String>
+//    fun fetchPhotos(): Call<FlickrResponse>
 
     @GET(
         "services/rest/?method=flickr.interestingness.getList" +
@@ -16,5 +18,5 @@ interface FlickrApi {
                 "&nojsoncallback=1" +
                 "&extras=url_s"
     )
-    fun fetchPhotos(): Call<FlickrResponse>
+    fun fetchPhotos(): Call<PhotoDeserializer>
 }
