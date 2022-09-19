@@ -1,9 +1,10 @@
 package com.example.photogallery.api
 
-import com.example.photogallery.FlickrFetchr
 import com.example.photogallery.PhotoDeserializer
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.GET
+import retrofit2.http.Url
 
 interface FlickrApi {
 //    @GET("/")
@@ -19,4 +20,7 @@ interface FlickrApi {
                 "&extras=url_s"
     )
     fun fetchPhotos(): Call<PhotoDeserializer>
+
+    @GET
+    fun fetchUrlBytes(@Url url: String): Call<ResponseBody>
 }
