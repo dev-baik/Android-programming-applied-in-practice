@@ -27,3 +27,4 @@
 | 22 | XML drawable |  |
 | 23 | 인텐트와 태스크 | 앱 아이콘 사용하기 |
 | 24 | HTTP와 백그라운드 태스크 | 커스텀 Gson 역직렬화 클래스 구현하기 |
+| 25 | Looper, Handler, HandlerThread |  |
